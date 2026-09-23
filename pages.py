@@ -789,7 +789,7 @@ function jpatch(o){return{method:'PATCH',headers:{'Content-Type':'application/js
 function openM(id){$(id).classList.add('show')}
 function closeM(id){$(id).classList.remove('show')}
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
-/* نقشه کپی: مقدارها از JS ست می‌شوند (بدون مشکل escape در onclick) */
+/* نقشه کپی: مقادیر از JS ست می‌شوند (بدون مشکل escape در onclick) */
 const COPY_MAP={};
 function copyKey(k){copyTxt(COPY_MAP[k]||'')}
 function copyTxt(t){if(!t){toast('چیزی برای کپی نیست',true);return}navigator.clipboard.writeText(t).then(()=>toast('کپی شد')).catch(()=>toast('کپی نشد',true))}
@@ -982,7 +982,7 @@ async function saveLink(){
     proxy_id:$('fProxy').value||null,
     note:$('fNote').value.trim(),
   };
-  if($('fDays').value)body.expires_days=+$('fDays').value;   // فقط اگر پر شده باشد ارسال شود (باگ پاک‌شدن انقضا رفع شد)
+  if($('fDays').value)body.expires_days=+$('fDays').value;   /* فقط وقتی پر شده باشد ارسال شود — باگ پاک‌شدن انقضا رفع شد */
   try{
     if(EDIT_LINK_ID){
       await api('/api/links/'+EDIT_LINK_ID,jpatch(body));toast('کانفیگ ویرایش شد');
@@ -1257,11 +1257,14 @@ setInterval(()=>{if(CUR==='links')loadLinks();if(CUR==='proxies')loadProxies()},
 </script>
 </body></html>"""
 
+# ── رندر نهایی داشبورد ──
+# ⚠️ نکته مهم: در پایتون از replace() استفاده می‌شود که «همه» تکرارها را
+# عوض می‌کند (برخلاف نسخه خراب قبلی با .split().join() که سینتکس JS بود!)
 DASHBOARD_HTML = (
     _DASH_TPL
-    .split("__LOGO_SVG__").join(LOGO_SVG)
-    .split("__HEARTBEAT__").join(HEARTBEAT_HTML)
-    .split("__GOLD_CSS__").join(_GOLD_CSS)
+    .replace("__LOGO_SVG__", LOGO_SVG)
+    .replace("__HEARTBEAT__", HEARTBEAT_HTML)
+    .replace("__GOLD_CSS__", _GOLD_CSS)
 )
 
 # ═══════════════════════════ صفحه عمومی گروه ساب ═══════════════════════════
